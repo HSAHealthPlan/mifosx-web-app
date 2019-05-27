@@ -6,15 +6,7 @@ import { HttpEvent, HttpInterceptor, HttpHandler, HttpRequest } from '@angular/c
 import { Observable } from 'rxjs';
 
 /** Environment Configuration */
-import { environment } from '../../../environments/environment';
-
-/** Http request options headers. */
-const httpOptions = {
-  headers: {
-    'Content-Type': 'application/json; charset=utf-8',
-    'Fineract-Platform-TenantId': environment.fineractPlatformTenantId
-  }
-};
+import { RuntimeConfigLoaderService } from 'runtime-config-loader';
 
 /** Authorization header. */
 const authorizationHeader = 'Authorization';
@@ -26,14 +18,23 @@ const twoFactorAccessTokenHeader = 'Fineract-Platform-TFA-Token';
  */
 @Injectable()
 export class AuthenticationInterceptor implements HttpInterceptor {
+  /** Http request options headers. */
+  private httpOptions: any;
 
-  constructor() {}
+  constructor(private environment: RuntimeConfigLoaderService) {
+    this.httpOptions = {
+      headers: {
+        'Content-Type': 'application/json; charset=utf-8',
+        'Fineract-Platform-TenantId': environment.getConfigObjectKey('fineractPlatformTenantId')
+      }
+    };
+  }
 
   /**
    * Intercepts a Http request and sets the request headers.
    */
   intercept(request: HttpRequest<any>, next: HttpHandler): Observable<HttpEvent<any>> {
-    request = request.clone({ setHeaders: httpOptions.headers });
+    request = request.clone({ setHeaders: this.httpOptions.headers });
     return next.handle(request);
   }
 
@@ -42,10 +43,10 @@ export class AuthenticationInterceptor implements HttpInterceptor {
    * @param {string} authenticationKey Authentication key.
    */
   setAuthorizationToken(authenticationKey: string) {
-    if (environment.oauth.enabled) {
-      httpOptions.headers[authorizationHeader] = `Bearer ${authenticationKey}`;
+    if (this.environment.getConfigObjectKey('oauth').enabled) {
+      this.httpOptions.headers[authorizationHeader] = `Bearer ${authenticationKey}`;
     } else {
-      httpOptions.headers[authorizationHeader] = `Basic ${authenticationKey}`;
+      this.httpOptions.headers[authorizationHeader] = `Basic ${authenticationKey}`;
     }
   }
 
@@ -54,21 +55,21 @@ export class AuthenticationInterceptor implements HttpInterceptor {
    * @param {string} twoFactorAccessToken Two factor access token.
    */
   setTwoFactorAccessToken(twoFactorAccessToken: string) {
-    httpOptions.headers[twoFactorAccessTokenHeader] = twoFactorAccessToken;
+    this.httpOptions.headers[twoFactorAccessTokenHeader] = twoFactorAccessToken;
   }
 
   /**
    * Removes the authorization header.
    */
   removeAuthorization() {
-    delete httpOptions.headers[authorizationHeader];
+    delete this.httpOptions.headers[authorizationHeader];
   }
 
   /**
    * Removes the two factor access token header.
    */
   removeTwoFactorAuthorization() {
-    delete httpOptions.headers[twoFactorAccessTokenHeader];
+    delete this.httpOptions.headers[twoFactorAccessTokenHeader];
   }
 
 }

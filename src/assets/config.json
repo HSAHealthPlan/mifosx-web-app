@@ -2,13 +2,13 @@
   "production": false,
   "version": "0.0.0.0",
   "fineractPlatformTenantId": "default",
-  "baseApiUrl": "https://demo.openmf.org",
+  "baseApiUrl": "https://10.10.7.106",
   "apiProvider": "/fineract-provider/api",
   "apiVersion": "/v1",
-  "serverUrl": "https://demo.openmf.org/fineract-provider/api/v1",
+  "serverUrl": "https://10.10.7.106/fineract-provider/api/v1",
   "oauth": {
     "enabled": false,
-    "serverUrl": "https://demo.openmf.org/fineract-provider/api"
+    "serverUrl": "https://10.10.7.106/fineract-provider/api"
   },
   "defaultLanguage": "en-US",
   "supportedLanguages": [

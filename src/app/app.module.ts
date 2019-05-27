@@ -1,5 +1,5 @@
 /** Angular Imports */
-import { NgModule } from '@angular/core';
+import { NgModule, APP_INITIALIZER } from '@angular/core';
 import { BrowserModule } from '@angular/platform-browser';
 import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
 import { HttpClientModule } from '@angular/common/http';
@@ -35,7 +35,7 @@ import { SystemModule } from './system/system.module';
 import { ProductsModule } from './products/products.module';
 
 /** Runtime Configuration Component */
-import { RuntimeConfigLoaderModule } from 'runtime-config-loader';
+import { RuntimeConfigLoaderModule, initConfig, RuntimeConfigLoaderService } from 'runtime-config-loader';
 
 /** Main Routing Module */
 import { AppRoutingModule } from './app-routing.module';
@@ -69,7 +69,14 @@ import { AppRoutingModule } from './app-routing.module';
     AppRoutingModule
   ],
   declarations: [WebAppComponent, NotFoundComponent],
-  providers: [],
+	providers: [
+    {
+    provide: APP_INITIALIZER,
+    useFactory: initConfig,
+    deps: [RuntimeConfigLoaderService],
+    multi: true,
+    }
+  ],
   bootstrap: [WebAppComponent]
 })
 export class AppModule { }

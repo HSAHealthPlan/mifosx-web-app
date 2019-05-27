@@ -2,7 +2,7 @@
 import { Component, OnInit } from '@angular/core';
 
 /** Environment Configuration */
-import { environment } from 'environments/environment';
+import { environment } from 'environments/environment'; //This is not dynamic (don't use RuntimeConfigLoaderService) because the version doesn't change
 
 /**
  *  Footer component.

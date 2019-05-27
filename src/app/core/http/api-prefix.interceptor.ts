@@ -23,8 +23,11 @@ export class ApiPrefixInterceptor implements HttpInterceptor {
     if(this.runtimeConfig === undefined) {
       this.runtimeConfig = this.__injector.get(RuntimeConfigLoaderService);
     }
-
-    request = request.clone({ url: this.runtimeConfig.getConfigObjectKey('serverUrl') + request.url });
+    const prefix = this.runtimeConfig.getConfigObjectKey('serverUrl');
+    if(!request.url.startsWith('.')) {
+      request = request.clone({ url: prefix + request.url });
+    }
+    
     return next.handle(request);
   }
 }

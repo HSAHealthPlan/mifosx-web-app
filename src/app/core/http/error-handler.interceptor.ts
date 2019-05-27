@@ -7,7 +7,7 @@ import { Observable } from 'rxjs';
 import { catchError } from 'rxjs/operators';
 
 /** Environment Configuration */
-import { environment } from 'environments/environment';
+import { RuntimeConfigLoaderService } from 'runtime-config-loader';
 
 /** Custom Services */
 import { Logger } from '../logger/logger.service';
@@ -25,7 +25,8 @@ export class ErrorHandlerInterceptor implements HttpInterceptor {
   /**
    * @param {AlertService} alertService Alert Service.
    */
-  constructor(private alertService: AlertService) {  }
+  constructor(private alertService: AlertService,
+              private environment: RuntimeConfigLoaderService) {  }
 
   /**
    * Intercepts a Http request and adds a default error handler.
@@ -46,11 +47,11 @@ export class ErrorHandlerInterceptor implements HttpInterceptor {
       }
     }
 
-    if (!environment.production) {
+    if (!this.environment.getConfigObjectKey('production')) {
       log.error(`Request Error: ${errorMessage}`);
     }
 
-    if (status === 401 || (environment.oauth.enabled && status === 400)) {
+    if (status === 401 || (this.environment.getConfigObjectKey('oauth').enabled && status === 400)) {
       this.alertService.alert({ type: 'Authentication Error', message: 'Invalid User Details. Please try again!' });
     } else if (status === 403 && errorMessage === 'The provided one time token is invalid') {
       this.alertService.alert({ type: 'Invalid Token', message: 'Invalid Token. Please try again!' });
