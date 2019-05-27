@@ -13,7 +13,7 @@ import { AlertService } from '../alert/alert.service';
 import { AuthenticationInterceptor } from './authentication.interceptor';
 
 /** Environment Configuration */
-import { environment } from '../../../environments/environment';
+import { RuntimeConfigLoaderService } from 'runtime-config-loader';
 
 /** Custom Models */
 import { LoginContext } from './login-context.model';
@@ -55,6 +55,7 @@ export class AuthenticationService {
    */
   constructor(private http: HttpClient,
               private alertService: AlertService,
+              private environment: RuntimeConfigLoaderService,
               private authenticationInterceptor: AuthenticationInterceptor) {
     this.rememberMe = false;
     this.storage = sessionStorage;
@@ -67,7 +68,7 @@ export class AuthenticationService {
         this.storage = localStorage;
       }
       const twoFactorAccessToken = JSON.parse(this.storage.getItem(this.twoFactorAuthenticationTokenStorageKey));
-      if (environment.oauth.enabled) {
+      if (this.environment.getConfigObjectKey('oauth').enabled) {
         this.refreshOAuthAccessToken();
       } else {
         authenticationInterceptor.setAuthorizationToken(savedCredentials.base64EncodedAuthenticationKey);
@@ -91,11 +92,11 @@ export class AuthenticationService {
     let httpParams = new HttpParams();
     httpParams = httpParams.set('username', loginContext.username);
     httpParams = httpParams.set('password', loginContext.password);
-    if (environment.oauth.enabled) {
+    if (this.environment.getConfigObjectKey('oauth').enabled) {
       httpParams = httpParams.set('client_id', 'community-app');
       httpParams = httpParams.set('grant_type', 'password');
       httpParams = httpParams.set('client_secret', '123');
-      return this.http.disableApiPrefix().post(`${environment.oauth.serverUrl}/oauth/token`, {}, { params: httpParams })
+      return this.http.disableApiPrefix().post(`${this.environment.getConfigObjectKey('oauth').serverUrl}/oauth/token`, {}, { params: httpParams })
         .pipe(
           map((tokenResponse: OAuth2Token) => {
             this.getUserDetails(tokenResponse);
@@ -150,7 +151,7 @@ export class AuthenticationService {
     httpParams = httpParams.set('grant_type', 'refresh_token');
     httpParams = httpParams.set('client_secret', '123');
     httpParams = httpParams.set('refresh_token', oAuthRefreshToken);
-    this.http.disableApiPrefix().post(`${environment.oauth.serverUrl}/oauth/token`, {}, { params: httpParams })
+    this.http.disableApiPrefix().post(`${this.environment.getConfigObjectKey('oauth').serverUrl}/oauth/token`, {}, { params: httpParams })
       .subscribe((tokenResponse: OAuth2Token) => {
         this.storage.setItem(this.oAuthTokenDetailsStorageKey, JSON.stringify(tokenResponse));
         this.authenticationInterceptor.setAuthorizationToken(tokenResponse.access_token);
@@ -172,7 +173,7 @@ export class AuthenticationService {
    * @param {Credentials} credentials Authenticated user credentials.
    */
   private onLoginSuccess(credentials: Credentials) {
-    if (environment.oauth.enabled) {
+    if (this.environment.getConfigObjectKey('oauth').enabled) {
       this.authenticationInterceptor.setAuthorizationToken(credentials.accessToken);
     } else {
       this.authenticationInterceptor.setAuthorizationToken(credentials.base64EncodedAuthenticationKey);
