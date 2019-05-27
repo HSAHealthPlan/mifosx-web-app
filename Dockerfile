@@ -39,5 +39,3 @@ CMD ["nginx", "-g", "daemon off;"]
 
 # Command to build: docker build -t mifosx:latest .
 # Command to run (dev): docker run -p 8080:80 mifosx:latest
-
-# What if, instead of pulling the environment settings file dynamically w/Preston's plugin, we instead replace it at deployment time w/a Container volume that points to a config?
