@@ -34,6 +34,8 @@ import { SelfServiceModule } from './self-service/self-service.module';
 import { SystemModule } from './system/system.module';
 import { ProductsModule } from './products/products.module';
 
+/** Runtime Configuration Component */
+import { RuntimeConfigLoaderModule } from 'runtime-config-loader';
 
 /** Main Routing Module */
 import { AppRoutingModule } from './app-routing.module';
@@ -48,6 +50,7 @@ import { AppRoutingModule } from './app-routing.module';
     BrowserModule,
     BrowserAnimationsModule,
     HttpClientModule,
+    RuntimeConfigLoaderModule,
     ServiceWorkerModule.register('./ngsw-worker.js', { enabled: environment.production }),
     TranslateModule.forRoot(),
     NgxChartsModule,
