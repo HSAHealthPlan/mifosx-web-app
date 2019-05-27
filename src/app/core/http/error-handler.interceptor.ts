@@ -21,7 +21,7 @@ const log = new Logger('ErrorHandlerInterceptor');
  */
 @Injectable()
 export class ErrorHandlerInterceptor implements HttpInterceptor {
-  private enironment: RuntimeConfigLoaderService;
+  private environment: RuntimeConfigLoaderService;
 
   /**
    * @param {AlertService} alertService Alert Service.
@@ -40,8 +40,8 @@ export class ErrorHandlerInterceptor implements HttpInterceptor {
    * Error handler.
    */
   private handleError(response: HttpErrorResponse): Observable<HttpEvent<any>> {
-    if(this.enironment === undefined) {
-      this.enironment = this.__injector.get(RuntimeConfigLoaderService);
+    if(this.environment === undefined) {
+      this.environment = this.__injector.get(RuntimeConfigLoaderService);
     }
 
     const status = response.status;
