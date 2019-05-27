@@ -1,5 +1,5 @@
 /** Angular Imports */
-import { Injectable } from '@angular/core';
+import { Injectable, Injector } from '@angular/core';
 import { HttpEvent, HttpInterceptor, HttpHandler, HttpRequest, HttpErrorResponse } from '@angular/common/http';
 
 /** rxjs Imports */
@@ -21,12 +21,13 @@ const log = new Logger('ErrorHandlerInterceptor');
  */
 @Injectable()
 export class ErrorHandlerInterceptor implements HttpInterceptor {
+  private enironment: RuntimeConfigLoaderService;
 
   /**
    * @param {AlertService} alertService Alert Service.
    */
-  constructor(private alertService: AlertService,
-              private environment: RuntimeConfigLoaderService) {  }
+  constructor(private __injector: Injector, 
+              private alertService: AlertService) {  }
 
   /**
    * Intercepts a Http request and adds a default error handler.
@@ -39,6 +40,10 @@ export class ErrorHandlerInterceptor implements HttpInterceptor {
    * Error handler.
    */
   private handleError(response: HttpErrorResponse): Observable<HttpEvent<any>> {
+    if(this.enironment === undefined) {
+      this.enironment = this.__injector.get(RuntimeConfigLoaderService);
+    }
+
     const status = response.status;
     let errorMessage = (response.error.developerMessage || response.message);
     if (response.error.errors) {

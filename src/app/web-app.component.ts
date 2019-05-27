@@ -12,7 +12,7 @@ import { filter, map, mergeMap } from 'rxjs/operators';
 import { TranslateService } from '@ngx-translate/core';
 
 /** Environment Configuration */
-import { RuntimeConfigLoaderService } from 'runtime-config-loader';
+import { environment } from 'environments/environment';
 
 /** Custom Services */
 import { Logger } from './core/logger/logger.service';
@@ -53,8 +53,7 @@ export class WebAppComponent implements OnInit {
               private i18nService: I18nService,
               private themeStorageService: ThemeStorageService,
               public snackBar: MatSnackBar,
-              private alertService: AlertService,
-              private environment: RuntimeConfigLoaderService) { }
+              private alertService: AlertService) { }
 
   /**
    * Initial Setup:
@@ -71,13 +70,13 @@ export class WebAppComponent implements OnInit {
    */
   ngOnInit() {
     // Setup logger
-    if (this.environment.getConfigObjectKey('production')) {
+    if (environment.production) {
       Logger.enableProductionMode();
     }
     log.debug('init');
 
     // Setup translations
-    this.i18nService.init(this.environment.getConfigObjectKey('defaultLanguage'), this.environment.getConfigObjectKey('supportedLanguages'));
+    this.i18nService.init(environment.defaultLanguage, environment.supportedLanguages);
 
     // Change page title on navigation or language change, based on route data
     const onNavigationEnd = this.router.events.pipe(filter(event => event instanceof NavigationEnd));
