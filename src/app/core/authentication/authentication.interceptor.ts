@@ -1,5 +1,5 @@
 /** Angular Imports */
-import { Injectable } from '@angular/core';
+import { Injectable, Injector } from '@angular/core';
 import { HttpEvent, HttpInterceptor, HttpHandler, HttpRequest } from '@angular/common/http';
 
 /** rxjs Imports */
@@ -10,6 +10,7 @@ import { RuntimeConfigLoaderService } from 'runtime-config-loader';
 
 /** Authorization header. */
 const authorizationHeader = 'Authorization';
+const tenantId = 'Fineract-Platform-TenantId';
 /** Two factor access token header. */
 const twoFactorAccessTokenHeader = 'Fineract-Platform-TFA-Token';
 
@@ -21,11 +22,10 @@ export class AuthenticationInterceptor implements HttpInterceptor {
   /** Http request options headers. */
   private httpOptions: any;
 
-  constructor(private environment: RuntimeConfigLoaderService) {
+  constructor(private __injector: Injector, private environment: RuntimeConfigLoaderService) {
     this.httpOptions = {
       headers: {
-        'Content-Type': 'application/json; charset=utf-8',
-        'Fineract-Platform-TenantId': environment.getConfigObjectKey('fineractPlatformTenantId')
+        'Content-Type': 'application/json; charset=utf-8'
       }
     };
   }
@@ -34,6 +34,14 @@ export class AuthenticationInterceptor implements HttpInterceptor {
    * Intercepts a Http request and sets the request headers.
    */
   intercept(request: HttpRequest<any>, next: HttpHandler): Observable<HttpEvent<any>> {
+    if(this.environment === undefined) {
+      this.environment = this.__injector.get(RuntimeConfigLoaderService);
+    }
+
+    if(this.environment.getConfigObjectKey('fineractPlatformTenantId')) {
+      this.httpOptions.headers[tenantId] = this.environment.getConfigObjectKey('fineractPlatformTenantId');
+    }
+
     request = request.clone({ setHeaders: this.httpOptions.headers });
     return next.handle(request);
   }

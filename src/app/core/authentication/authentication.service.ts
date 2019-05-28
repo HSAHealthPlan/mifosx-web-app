@@ -68,7 +68,7 @@ export class AuthenticationService {
         this.storage = localStorage;
       }
       const twoFactorAccessToken = JSON.parse(this.storage.getItem(this.twoFactorAuthenticationTokenStorageKey));
-      if (this.environment.getConfigObjectKey('oauth').enabled) {
+      if (environment.getConfigObjectKey('oauth').enabled) {
         this.refreshOAuthAccessToken();
       } else {
         authenticationInterceptor.setAuthorizationToken(savedCredentials.base64EncodedAuthenticationKey);

@@ -45,8 +45,12 @@ export class ErrorHandlerInterceptor implements HttpInterceptor {
     }
 
     const status = response.status;
-    let errorMessage = (response.error.developerMessage || response.message);
-    if (response.error.errors) {
+    let errorMessage = response.message;
+    if (response.error && response.error.developerMessage) {
+      errorMessage = response.error.developerMessage;
+    }
+
+    if (response.error && response.error.errors) {
       if (response.error.errors[0]) {
         errorMessage = response.error.errors[0].defaultUserMessage || response.error.errors[0].developerMessage;
       }
